@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+	.el-upload-list__item{
+		max-width: 205px;
+	}
+	.el-button{
+		width: 120px;
+	}
+</style>
+</head>
+
+<body>
+<div class="wrap"  id="goodsAddApp">
+  <!-- main begin-->
+    
+ <el-form :model="goods" :rules="rules" ref="resetForm" label-width="100px" class="demo-ruleForm">
+ 	    <h1  style="text-align: center;height: 30px;    line-height: 30px; color: #E6A23C;">添加拍卖商品</h1>
+  <el-form-item label="名称" prop="nameMC">
+    <el-input style="width:300px;" v-model="goods.nameMC"></el-input>
+  </el-form-item>
+ 
+   <el-form-item label="起拍价" prop="price">
+    						<el-input
+    							style="width:300px;"
+    maxlength="8"
+    oninput="value=value.replace(/[^\d.]/g,'')"
+    v-model="goods.price"
+    placeholder="请输入价格"
+clearable
+  >
+  </el-form-item>
+
+
+   <el-form-item label="开始时间" prop="startDate">
+    <el-date-picker type="date" placeholder="选择日期" v-model="goods.startDate" style="width:300px;"></el-date-picker>
+  </el-form-item>
+ <el-form-item label="结束时间" prop="endDate">
+    <el-date-picker type="date" placeholder="选择日期" v-model="goods.endDate" style="width:300px;"></el-date-picker>
+  </el-form-item>
+  <el-form-item label="描述" prop="nameMS">
+    <el-input style="width:300px;" type="textarea" v-model="goods.nameMS"></el-input>
+  </el-form-item>
+  
+
+  <el-form-item prop="goodsImg">
+  <div style="float: right;margin-top: -43ex;margin-right:35ex;">
+  <el-upload
+  class="upload-demo"
+  action="https://jsonplaceholder.typicode.com/posts/"
+  :on-preview="handlePreview"
+  :on-remove="handleRemove"
+  :file-list="fileList"
+  :on-change="checkType"
+  list-type="picture"
+  	>
+  <el-button size="small" type="primary">竞拍图片上传</el-button>
+  <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg文件，且不超过1.5M</div>
+</el-upload>
+  
+  </div>
+  </el-form-item>
+  <el-form-item>
+    <el-button type="primary" @click="submitForm('resetForm')">确定添加</el-button>
+  </el-form-item>
+</el-form>
+</div>
+</body>
+<script>
+	var Main={
+    data() {
+      return {
+      	fileList:[],
+      goods:{
+      		goodsId:'',
+          startDate:'',
+          endDate:'',
+          nameMS:'',
+          nameMC:'',
+					price:'',
+					status:0,
+      		goodsImg:""
+      	},
+        rules: {
+          nameMC: [
+            { required: true, message: '请输入名称', trigger: 'blur' }
+          ],
+          fileList: [
+            { type: 'file', required: true, message: '请选择日期', trigger: 'change' }
+          ], 
+          startDate: [
+            { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+          ],
+          endDate: [
+            { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
+          ],
+          price: [
+            { required: true, message: '请输入起拍价格', trigger: 'blur' }
+          ],
+          nameMS: [
+            { required: true, message: '请输入描述', trigger: 'blur' }
+          ]
+        }
+      };
+    },
+    methods: {
+    	
+    	/*图片操作*/
+    	 handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      
+      /*商品添加*/
+      submitForm(formName) {
+ 
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+          	     	if(this.fileList.length==0){
+      		this.$notify({
+          title: '警告',
+          message: '未选择图片',
+          type: 'warning',
+            offset: 100
+        });
+      	}else{
+      		alert('submit!');
+      	}
+            
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      /*图片格式判断*/
+      checkType(file,fileList){
+      	
+      	/*不管怎么选择 只能选一张*/
+      	let fileType=file.name.substring(file.name.lastIndexOf('.')+1);
+   		this.fileList=[];//清除之前的
+      	this.fileList.splice(0,0,file);//保存现在选择的图片
+      	if(fileType =='jpeg' || fileType =='jpg' || fileType == 'png' || fileType =='JPEG' || fileType =='JPG' || fileType == 'PNG'){
+      	
+      	}else{
+      		
+      		this.fileList=[];
+      	 this.$notify.error({
+          title: '错误',
+          message: '图片格式错误',
+          offset: 100
+        });
+      			return false;
+      	}
+      	
+      	if(file.size / 1024 / 1024 >1.5 ){
+      	this.fileList=[];
+      	 this.$notify.error({
+          title: '错误',
+          message: '图片大小不能超过1.5M',
+          offset: 100
+        });
+      				return false;
+      	}
+ 
+      	
+      }
+    }
+  }
+	var goodsAddApp=Vue.extend(Main);
+			new goodsAddApp().$mount("#goodsAddApp")
+</script>
+</html>
